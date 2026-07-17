@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.ticketing.contracts.seat";
+option java_outer_classname = "SeatReservationProto";
+
+package seat;
+
+service SeatReservation {
+  rpc Hold (HoldRequest) returns (HoldResponse);
+  rpc Sell (SellRequest) returns (SellResponse);
+  rpc GetSeatStatus (SeatStatusRequest) returns (SeatStatusResponse);
+}
+
+
+message HoldRequest {
+  string seat_id = 1;
+  string booking_id =2;
+}
+
+message HoldResponse {
+  bool held = 1;
+}
+
+message SellRequest {
+  string seat_id = 1;
+  string booking_id =2;
+}
+
+message SellResponse {
+  bool sold =1; //field #1 is a boolean called sold
+  string message =2; //field #2 is a string called message
+}
+
+message SeatStatusRequest {
+  string seat_id = 1;
+}
+
+message SeatStatusResponse {
+  bool   sold       = 1;
+  string booking_id = 2;
+}
