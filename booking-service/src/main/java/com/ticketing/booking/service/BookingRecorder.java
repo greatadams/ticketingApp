@@ -61,6 +61,9 @@ public class BookingRecorder {
         }
 
         return booking;// ← ONE transaction. Booking + outbox commit together, or neither does.
+        //bookingRepository.save(booking);   // bookings table
+        //outboxRepository.save(row);        // outbox table
+        //they commited together or row both back
     }
 
 }
