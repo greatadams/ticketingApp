@@ -14,7 +14,7 @@ import java.util.UUID;
 public interface SeatRepository extends JpaRepository<Seat, UUID> {
     List<Seat> findByEventId(UUID eventId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Seat s SET s.status = :sold, " +
     "s.bookingId = :bookingId " +
     "WHERE s.id = :seatId AND s.status = :available"
@@ -25,6 +25,5 @@ public interface SeatRepository extends JpaRepository<Seat, UUID> {
                         @Param("available") Status available
     );
 
-;
 
 }
