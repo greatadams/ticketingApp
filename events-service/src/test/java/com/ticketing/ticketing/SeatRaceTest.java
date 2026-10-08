@@ -1,9 +1,10 @@
 package com.ticketing.ticketing;
 
 
-import com.ticketing.ticketing.events.model.Status;
+import com.ticketing.ticketing.events.model.Seat;
 import com.ticketing.ticketing.events.repository.SeatRepository;
 import com.ticketing.ticketing.events.service.SeatService;
+import com.ticketing.ticketing.events.service.HoldService;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +27,18 @@ class SeatRaceTest {
     SeatService seatService;
     @Autowired
     SeatRepository seatRepository;
+    @Autowired
+    HoldService holdService;
 
     @Test
     void twenty_buyers_one_seat() throws InterruptedException {
         // grab one available seat to fight over
-        UUID seatId = seatRepository.findAll().stream()
-                .filter(s -> s.getStatus() == Status.AVAILABLE)
-                .findFirst().orElseThrow().getId();
+        Seat seat = new Seat();
+        seat.setEventId(UUID.randomUUID());
+        seat.setSeatLabel("RACE-" + UUID.randomUUID());
+
+        seat = seatRepository.saveAndFlush(seat);
+        UUID seatId = seat.getId();
 
         int threads = 20;
         var pool = Executors.newFixedThreadPool(threads);
@@ -45,8 +51,12 @@ class SeatRaceTest {
             pool.submit(() -> {
                 try {
                     startLine.await();             // everyone waits here...
-                    seatService.bookSeat(seatId, buyer);
-                    successes.incrementAndGet();
+                    if (holdService.placeHold(seatId, buyer)) {
+                        seatService.bookSeat(seatId, buyer);
+                        successes.incrementAndGet();
+                    } else {
+                        failures.incrementAndGet();
+                    }
                 } catch (Exception e) {
                     failures.incrementAndGet();     // SeatAlreadySoldException lands here
                 }
