@@ -49,6 +49,7 @@ jobs:
         env:
           DB_USER: ticketing
           DB_PASSWORD: ticketing
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ticketing_db
   docker-build:
      name: Build Events Docker Image
      runs-on: ubuntu-latest
